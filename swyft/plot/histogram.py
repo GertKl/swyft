@@ -107,8 +107,11 @@ def hist1d(
         wspace=space_between_axes,
         hspace=space_between_axes,
     )
+    
+    ax_flat = axes.flatten() if d>1 else np.array([axes])
 
-    for i, (k, ax) in enumerate(zip(sorted(marginal_1d.keys()), axes.flatten())):
+    #for i, (k, ax) in enumerate(zip(sorted(marginal_1d.keys()), axes.flatten())):
+    for i, (k, ax) in enumerate(zip(sorted(marginal_1d.keys()), ax_flat)):
         df = marginal_1d[k]
         sns.histplot(
             data=df,
