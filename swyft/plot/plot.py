@@ -187,7 +187,7 @@ def _plot_1d(
     ax.set_ylim([-v.max() * 0.05, v.max() * 1.1])
 
     if truth is not None:
-        ax.axvline(truth[parname], color="k", lw=1.0, zorder=10, ls=(1, (5, 1)))
+        ax.axvline(truth[parname], color=color_truth, lw=1.0, zorder=10, ls=(1, (5, 1)))
 
 
 #####
