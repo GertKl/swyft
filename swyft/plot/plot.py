@@ -61,6 +61,7 @@ def _plot_2d(
     ax=None,
     bins=100,
     color="k",
+    color_truth="k",
     cmap="gray_r",
     smooth=0.0,
     cred_level=[0.68268, 0.95450, 0.99730],
@@ -123,9 +124,9 @@ def _plot_2d(
 
     if truth is not None:
         if parname1 in truth.keys():
-            ax.axvline(truth[parname1], color="k", lw=1.0, zorder=10, ls=(1, (5, 1)))
+            ax.axvline(truth[parname1], color=color_truth, lw=1.0, zorder=10, ls=(1, (5, 1)))
         if parname2 in truth.keys():
-            ax.axhline(truth[parname2], color="k", lw=1.0, zorder=10, ls=(1, (5, 1)))
+            ax.axhline(truth[parname2], color=color_truth, lw=1.0, zorder=10, ls=(1, (5, 1)))
         if parname1 in truth.keys() and parname2 in truth.keys():
             ax.scatter(
                 [truth[parname1]], [truth[parname2]], c="k", marker=".", s=100,
@@ -201,6 +202,7 @@ def plot_corner(
     bins=100,
     figsize=None,
     color="k",
+    color_truth="k",
     labels=None,
     label_args={},
     contours_1d: bool = True,
@@ -291,6 +293,7 @@ def plot_corner(
                         parnames[i],
                         ax=ax,
                         color=color,
+                        color_truth=color_truth,
                         bins=bins,
                         smooth=smooth,
                         cred_level=cred_level,
@@ -307,6 +310,7 @@ def plot_corner(
                         parnames[i],
                         ax=ax,
                         color=color,
+                        color_truth=color_truth,
                         bins=bins,
                         contours=contours_1d,
                         smooth=smooth,
