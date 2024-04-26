@@ -278,23 +278,23 @@ class ZarrStore:
     def sims_required(self):
         return sum(self.root["meta"]["sim_status"][:] == 0)
 
-    def simulate(self, sampler, max_sims=None, batch_size=10):
+    def simulate(self, sampler, max_sims=None, batch_size=10, progress_bar=True):
         total_sims = 0
         if isinstance(sampler, swyft.Simulator):
             sampler = sampler.sample
         while self.sims_required > 0:
             if max_sims is not None and total_sims >= max_sims:
                 break
-            num_sims = self._simulate_batch(sampler, batch_size)
+            num_sims = self._simulate_batch(sampler, batch_size,progress_bar=progress_bar)
             total_sims += num_sims
 
-    def _simulate_batch(self, sample_fn, batch_size):
+    def _simulate_batch(self, sample_fn, batch_size, progress_bar=True):
         # Run simulator
         num_sims = min(batch_size, self.sims_required)
         if num_sims == 0:
             return num_sims
 
-        samples = sample_fn(num_sims)
+        samples = sample_fn(num_sims, progress_bar=progress_bar)
 
         # Reserve slots
         with self.lock:

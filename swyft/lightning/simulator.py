@@ -322,6 +322,7 @@ class Simulator:
         targets: Optional[Sequence[str]] = None,
         conditions: Union[Dict, Callable] = {},
         exclude: Optional[Sequence[str]] = [],
+        progress_bar: bool = True,
     ):
         """Sample from the simulator.
 
@@ -333,12 +334,13 @@ class Simulator:
                 a dictionary with conditions.
             exclude: Optional list of parameters that are excluded from the
                 returned samples.  Can be used to reduce memory consumption.
+            progress_bar: Whether the progress bar should be shown or not. 
         """
         if N is None:
             return Sample(self._run(targets, conditions))
 
         out = []
-        for _ in tqdm(range(N)):
+        for _ in tqdm(range(N), disable=not progress_bar):
             result = self._run(targets, conditions)
             for key in exclude:
                 result.pop(key, None)
