@@ -75,6 +75,7 @@ class Samples(dict):
         on_after_load_sample=None,
         repeat=None,
         num_workers=0,
+        pin_memory=False,
     ):
         """Generator function to directly generate a dataloader object.
 
@@ -88,7 +89,7 @@ class Samples(dict):
         if repeat is not None:
             dataset = swyft.lightning.data.RepeatDatasetWrapper(dataset, repeat=repeat)
         return torch.utils.data.DataLoader(
-            dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers
+            dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=pin_memory,
         )
 
 
