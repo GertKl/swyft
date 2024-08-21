@@ -67,6 +67,7 @@ def _plot_2d(
     cred_level=[0.68268, 0.95450, 0.99730],
     truth=None,
     smooth_prior=False,
+    imshow=True,
 ):
     """Plot 2-dimensional posterior.
 
@@ -82,6 +83,7 @@ def _plot_2d(
         cred_level: Credible levels for contours
         truth: Dictionary with parameters names as keys and true values
         smooth_prior: Smooth and histogram prior instead of posterior (default False)
+        imshow: Whether or not to show the histogram using imshow (default True)
     """
     counts, xy = get_pdf(
         lrs_coll,
@@ -112,13 +114,14 @@ def _plot_2d(
         linestyles=[":", "--", "-"],
         colors=color,
     )
-    ax.imshow(
-        counts.T,
-        extent=[xbins.min(), xbins.max(), ybins.min(), ybins.max()],
-        cmap=cmap,
-        origin="lower",
-        aspect="auto",
-    )
+    if imshow:
+        ax.imshow(
+            counts.T,
+            extent=[xbins.min(), xbins.max(), ybins.min(), ybins.max()],
+            cmap=cmap,
+            origin="lower",
+            aspect="auto",
+        )
     ax.set_xlim([xbins.min(), xbins.max()])
     ax.set_ylim([ybins.min(), ybins.max()])
 
@@ -211,6 +214,7 @@ def plot_corner(
     cred_level=[0.68268, 0.95450, 0.99730],
     truth=None,
     smooth_prior=False,
+    imshow=True,
     #    plot_diagonal=True  # TODO: Implement supression of diagonals
 ) -> None:
     """Make a beautiful corner plot.
@@ -229,6 +233,7 @@ def plot_corner(
         cred_level: Credible levels for contours
         truth: Dictionary with parameters names as keys and true values
         smooth_prior: Smooth and histogram prior instead of posterior (default False)
+        imshow: Whether or not to show the histogram using imshow (default True)
     """
     K = len(parnames)
     if fig is None:
@@ -299,6 +304,7 @@ def plot_corner(
                         cred_level=cred_level,
                         truth=truth,
                         smooth_prior=smooth_prior,
+                        imshow=imshow,
                     )
                 except swyft.SwyftParameterError:
                     pass
@@ -561,6 +567,7 @@ def plot_pair(
             cred_level=cred_level,
             truth=truth,
             smooth_prior=smooth_prior,
+            imshow=imshow,
         )
         ax.set_xlabel(labels[k][0], **label_args)
         ax.set_ylabel(labels[k][1], **label_args)
