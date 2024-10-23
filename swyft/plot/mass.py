@@ -102,14 +102,17 @@ def plot_empirical_z_score(
     z_mean: np.ndarray,
     z_interval: np.ndarray,
     mean_color: str = "black",
-    interval_color: str = "0.8",
+    label=None,
+    interval_opacity: float = 0.5,
     diagonal_color: str = "darkgreen",
     sigma_color: str = "red",
     xlim: Optional[Tuple[float, float]] = None,
     ylim: Optional[Tuple[float, float]] = None,
     xlabel: Optional[str] = r"Empirical coverage [$z_p$]",
     ylabel: Optional[str] = r"Nominal credibility [$z_p$]",
+    interval_label = None,
     diagonal_text: bool = False,
+    residuals = False,
 ) -> Axes:
     """target a particular matplotlib Axes and produce an empirical coverage test plot with Jeffrey's interval
 
@@ -131,23 +134,38 @@ def plot_empirical_z_score(
     Returns:
         the matplotlib axes given
     """
-    lower = z_interval[:, 0]
-    upper = z_interval[:, 1]
-    assert np.all(lower <= upper), "the lower interval must be <= the upper interval."
-    upper = np.where(upper == np.inf, 100.0, upper)
-
-    # empirical lines & interval
-    axes.plot(nominal_z_scores, z_mean, color=mean_color)
-    axes.fill_between(nominal_z_scores, lower, upper, color=interval_color)
-
-    # diagonal line
+    
     max_z_score = np.max(nominal_z_scores)
-    axes.plot([0, max_z_score], [0, max_z_score], "--", color=diagonal_color)
+    
+    if not residuals:
+        lower = z_interval[:, 0]
+        upper = z_interval[:, 1]
+        assert np.all(lower <= upper), "the lower interval must be <= the upper interval."
+        upper = np.where(upper == np.inf, 100.0, upper)
+
+        # empirical lines & interval
+        axes.plot(nominal_z_scores, z_mean, color=mean_color,label=label)
+        axes.fill_between(nominal_z_scores, lower, upper, color=mean_color,alpha=interval_opacity, label=interval_label)
+
+        # diagonal line
+        if not diagonal_color is None: axes.plot([0, max_z_score], [0, max_z_score], "--", color=diagonal_color)
+    else:
+        lower = z_interval[:, 0]-nominal_z_scores
+        upper = z_interval[:, 1]-nominal_z_scores
+        assert np.all(lower <= upper), "the lower interval must be <= the upper interval."
+        upper = np.where(upper == np.inf, 100.0, upper)
+
+        # empirical lines & interval
+        axes.plot(nominal_z_scores, z_mean-nominal_z_scores, color=mean_color,label=label)
+        axes.fill_between(nominal_z_scores, lower, upper, color=mean_color,alpha=interval_opacity, label=interval_label)
+
+        # diagonal line
+        if not diagonal_color is None: axes.plot([0, max_z_score], [0, 0], "--", color=diagonal_color)
 
     # horizontal and vertical lines, vertical are the "truth", horizontal are empirical
     for i_sigma in range(1, int(max_z_score) + 1):
         empirical_i_sigma = np.interp(i_sigma, nominal_z_scores, z_mean)
-        if empirical_i_sigma != np.inf:  # when the vertical line intersects z_mean
+        if empirical_i_sigma != np.inf and not sigma_color is None and not residuals:  # when the vertical line intersects z_mean
             # Horizontal line
             axes.plot(
                 [0, i_sigma],
@@ -178,7 +196,7 @@ def plot_empirical_z_score(
     axes.set_xlabel(ylabel)
 
     # Add the semantic meaning of being above / below diagonal
-    if diagonal_text:
+    if diagonal_text and not residuals:
         raise NotImplementedError("must add rotation description")
         phi = None
         axes.text(
@@ -206,7 +224,7 @@ def plot_empirical_z_score(
     else:
         axes.set_xlim(xlim)
 
-    if ylim is None:
+    if ylim is None and not residuals:
         axes.set_ylim([0, max_z_score + np.round(0.15 * max_z_score, 1)])
     else:
         axes.set_ylim(ylim)

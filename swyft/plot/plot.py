@@ -338,6 +338,15 @@ def plot_zz(
     z_max: float = 3.5,
     bins: int = 50,
     ax=None,
+    color = 'k',
+    diagonal_color='g',
+    label = None,
+    interval_label = None,
+    interval_opacity=0.5,
+    x_label = "Nominal credibility [$1-p$]",
+    y_label = "Empirical coverage [$1-p$]",
+    sigma_color='r',
+    residuals=False,
 ):
     """Make a zz plot.
 
@@ -350,7 +359,10 @@ def plot_zz(
     """
     cov = swyft.estimate_coverage(coverage_samples, params, z_max=z_max, bins=bins)
     ax = ax if ax else plt.gca()
-    plot_empirical_z_score(ax, cov[:, 0], cov[:, 1], cov[:, 2:])
+    plot_empirical_z_score(
+    	ax, cov[:, 0], cov[:, 1], cov[:, 2:], mean_color=color,diagonal_color=diagonal_color,label=label,interval_label=interval_label,
+    	interval_opacity=interval_opacity,xlabel=x_label,ylabel=y_label,sigma_color=sigma_color,residuals=residuals,
+    	)
 
 
 def plot_pp(
@@ -359,6 +371,14 @@ def plot_pp(
     z_max: float = 3.5,
     bins: int = 50,
     ax=None,
+    color = 'k',
+    diagonal_color='g',
+    label = None,
+    interval_label = None,
+    interval_opacity=0.5,
+    x_label = "Nominal credibility [$1-p$]",
+    y_label = "Empirical coverage [$1-p$]",
+    residuals = False,
 ):
     """Make a pp plot.
 
@@ -372,11 +392,19 @@ def plot_pp(
     cov = swyft.estimate_coverage(coverage_samples, params, z_max=z_max, bins=bins)
     alphas = 1 - get_alpha(cov)
     ax = ax if ax else plt.gca()
-    ax.fill_between(alphas[:, 0], alphas[:, 2], alphas[:, 3], color="0.8")
-    ax.plot(alphas[:, 0], alphas[:, 1], "k")
-    plt.plot([0, 1], [0, 1], "g--")
-    plt.xlabel("Nominal credibility [$1-p$]")
-    plt.ylabel("Empirical coverage [$1-p$]")
+    if not residuals:
+        ax.fill_between(alphas[:, 0], alphas[:, 2], alphas[:, 3], color=color,alpha=interval_opacity, label=interval_label)
+        ax.plot(alphas[:, 0], alphas[:, 1], color=color,label=label)
+        if not diagonal_color is None:
+            ax.plot([0, 1], [0, 1], color=diagonal_color, linestyle='--')
+    else:
+        ax.fill_between(alphas[:, 0], alphas[:, 2]-alphas[:, 0], alphas[:, 3]-alphas[:, 0], color=color,alpha=interval_opacity, label=interval_label)
+        ax.plot(alphas[:, 0], alphas[:, 1]-alphas[:, 0], color=color,label=label)
+        if not diagonal_color is None:
+            ax.plot([0, 1], [0, 0], color=diagonal_color, linestyle='--')
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
 
 
 def plot_posterior(
